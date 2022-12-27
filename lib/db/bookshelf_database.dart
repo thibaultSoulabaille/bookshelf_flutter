@@ -2,19 +2,19 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:bookshelf/model/shelf.dart';
 
-class ShelvesDatabase {
+class BookShelfDatabase {
   // instance of shelve database
-  static final ShelvesDatabase instance = ShelvesDatabase._init();
+  static final BookShelfDatabase instance = BookShelfDatabase._init();
 
   static Database? _database;
 
   // private constructor
-  ShelvesDatabase._init();
+  BookShelfDatabase._init();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
 
-    _database = await _initDB('shelves.db');
+    _database = await _initDB('bookshelf.db');
     return _database!;
   }
 
@@ -46,6 +46,21 @@ class ShelvesDatabase {
       'shelves',
       shelve.toMap(),
       conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  Future<void> updateShelf(Shelf shelf) async {
+    // Get a reference to the database.
+    final db = await database;
+
+    // Update the given Shelf.
+    await db.update(
+      'shelves',
+      shelf.toMap(),
+      // Ensure that the Shelf has a matching id.
+      where: 'id = ?',
+      // Pass the Shelf's id as a whereArg to prevent SQL injection.
+      whereArgs: [shelf.id],
     );
   }
 

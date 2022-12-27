@@ -1,5 +1,38 @@
 import 'package:flutter/material.dart';
 
+/*
+const lightColorScheme = ColorScheme(
+  brightness: Brightness.light,
+  primary: Color(0xFF7B5800),
+  onPrimary: Color(0xFFFFFFFF),
+  primaryContainer: Color(0xFFFFDEA4),
+  onPrimaryContainer: Color(0xFF261900),
+  secondary: Color(0xFF6C5C3F),
+  onSecondary: Color(0xFFFFFFFF),
+  secondaryContainer: Color(0xFFF6E0BB),
+  onSecondaryContainer: Color(0xFF251A04),
+  tertiary: Color(0xFF4C6545),
+  onTertiary: Color(0xFFFFFFFF),
+  tertiaryContainer: Color(0xFFCEEBC2),
+  onTertiaryContainer: Color(0xFF0A2007),
+  error: Color(0xFFBA1A1A),
+  errorContainer: Color(0xFFFFDAD6),
+  onError: Color(0xFFFFFFFF),
+  onErrorContainer: Color(0xFF410002),
+  background: Color(0xFFFFFBFF),
+  onBackground: Color(0xFF1E1B16),
+  surface: Color(0xFFFFFBFF),
+  onSurface: Color(0xFF1E1B16),
+  surfaceVariant: Color(0xFFEEE1CF),
+  onSurfaceVariant: Color(0xFF4E4639),
+  outline: Color(0xFF7F7667),
+  onInverseSurface: Color(0xFFF8EFE7),
+  inverseSurface: Color(0xFF34302A),
+  inversePrimary: Color(0xFFF6BE48),
+  shadow: Color(0xFF000000),
+  surfaceTint: Color(0xFF7B5800),
+);*/
+
 /* RED
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
@@ -33,7 +66,7 @@ const lightColorScheme = ColorScheme(
   surfaceTint: Color(0xFFA13E39),
 );*/
 
-
+/*
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
   primary: Color(0xFF49670B),
@@ -66,9 +99,8 @@ const lightColorScheme = ColorScheme(
   surfaceTint: Color(0xFF49670B),
   // outlineVariant: Color(0xFFC5C8B9),
   // scrim: Color(0xFF000000),
-);
+);*/
 
-/*
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
   primary: Color(0xFF006590),
@@ -99,4 +131,4 @@ const lightColorScheme = ColorScheme(
   inversePrimary: Color(0xFF89CEFF),
   shadow: Color(0xFF000000),
   surfaceTint: Color(0xFF006590),
-);*/
+);

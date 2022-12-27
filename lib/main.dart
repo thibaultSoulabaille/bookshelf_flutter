@@ -25,9 +25,13 @@ class MyApp extends StatelessWidget {
                   ? ThemeData(
                       useMaterial3: true,
                       colorScheme: darkColorScheme,
+                      backgroundColor: darkColorScheme.background,
+                      scaffoldBackgroundColor: darkColorScheme.background,
                       appBarTheme: AppBarTheme(
                         backgroundColor: darkColorScheme.surface,
                         foregroundColor: darkColorScheme.onSurface,
+                        elevation: 0,
+                        scrolledUnderElevation: 2,
                       ),
                       floatingActionButtonTheme: FloatingActionButtonThemeData(
                         foregroundColor: darkColorScheme.onPrimaryContainer,
@@ -53,21 +57,21 @@ class MyApp extends StatelessWidget {
                             darkColorScheme.surface,
                             darkColorScheme.surfaceTint,
                             1),
+                        // elevation: 1,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(28),
+                            topRight: Radius.circular(16),
                           ),
                         ),
                         width: 360,
                       ),
                       listTileTheme: ListTileThemeData(
+                        horizontalTitleGap: 16,
+                        minVerticalPadding: 0,
+                        minLeadingWidth: 24,
+                        contentPadding: const EdgeInsets.only(left: 16, right: 24),
                         textColor: darkColorScheme.onSurface,
                         iconColor: darkColorScheme.onSurfaceVariant,
-                        selectedColor: darkColorScheme.onSecondaryContainer,
-                        selectedTileColor: darkColorScheme.secondaryContainer,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(24)),
-                        ),
                       ),
                       dialogBackgroundColor: ElevationOverlay.applySurfaceTint(
                           darkColorScheme.surface,
@@ -83,10 +87,13 @@ class MyApp extends StatelessWidget {
                   : ThemeData(
                       useMaterial3: true,
                       colorScheme: lightColorScheme,
+                      backgroundColor: lightColorScheme.background,
                       scaffoldBackgroundColor: lightColorScheme.background,
                       appBarTheme: AppBarTheme(
                         backgroundColor: lightColorScheme.surface,
                         foregroundColor: lightColorScheme.onSurface,
+                        elevation: 0,
+                        scrolledUnderElevation: 2,
                       ),
                       floatingActionButtonTheme: FloatingActionButtonThemeData(
                         foregroundColor: lightColorScheme.onPrimaryContainer,
@@ -112,21 +119,21 @@ class MyApp extends StatelessWidget {
                             lightColorScheme.surface,
                             lightColorScheme.surfaceTint,
                             1),
+                        // elevation: 1,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(28),
+                            topRight: Radius.circular(16),
                           ),
                         ),
                         width: 360,
                       ),
                       listTileTheme: ListTileThemeData(
+                        horizontalTitleGap: 16,
+                        minVerticalPadding: 0,
+                        minLeadingWidth: 24,
+                        contentPadding: const EdgeInsets.only(left: 16, right: 24),
                         textColor: lightColorScheme.onSurface,
                         iconColor: lightColorScheme.onSurfaceVariant,
-                        selectedColor: lightColorScheme.onSecondaryContainer,
-                        selectedTileColor: lightColorScheme.secondaryContainer,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(24)),
-                        ),
                       ),
                       dialogBackgroundColor: ElevationOverlay.applySurfaceTint(
                           lightColorScheme.surface,

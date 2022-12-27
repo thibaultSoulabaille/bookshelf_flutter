@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:bookshelf/db/shelves_database.dart';
+import 'package:bookshelf/db/bookshelf_database.dart';
 import 'package:bookshelf/model/shelf.dart';
 import 'package:bookshelf/pages/edit_shelf.dart';
 import 'package:bookshelf/pages/settings.dart';
+
+import 'books.dart';
 
 class Shelves extends StatefulWidget {
   const Shelves({Key? key}) : super(key: key);
@@ -17,21 +19,21 @@ class _ShelvesState extends State<Shelves> {
 
   @override
   void initState() {
+    shelves = [];
     super.initState();
     refreshShelves();
   }
 
   @override
   void dispose() {
-    ShelvesDatabase.instance.close();
-
+    BookShelfDatabase.instance.close();
     super.dispose();
   }
 
   Future refreshShelves() async {
     setState(() => isLoading = true);
 
-    shelves = await ShelvesDatabase.instance.loadAllShelves();
+    shelves = await BookShelfDatabase.instance.loadAllShelves();
 
     setState(() => isLoading = false);
   }
@@ -54,28 +56,34 @@ class _ShelvesState extends State<Shelves> {
                 height: 4,
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all(Radius.circular(4)),
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurfaceVariant
+                      .withOpacity(0.6),
                 ),
-                child: const Divider(),
               ),
             ),
             ListTile(
-              textColor: Theme.of(context).colorScheme.onSecondaryContainer,
               title: Text(
                 shelfName,
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               subtitle: Text(
                 "$shelfLength books",
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
             Divider(
-              height: 8,
-              thickness: 1,
               color: Theme.of(context).colorScheme.outline,
+              indent: 16,
+              endIndent: 16,
             ),
             ListTile(
-              leading: const Icon(Icons.delete_outline),
-              title: const Text('Delete'),
+              leading: const Icon(Icons.delete_outlined),
+              title: Text(
+                'Delete',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
               onTap: () {
                 showDialog<String>(
                   context: context,
@@ -90,7 +98,7 @@ class _ShelvesState extends State<Shelves> {
                       ),
                       TextButton(
                         onPressed: () {
-                          ShelvesDatabase.instance.deleteShelf(shelfId);
+                          BookShelfDatabase.instance.deleteShelf(shelfId);
                           refreshShelves();
                           Navigator.pop(context, 'OK');
                           Navigator.of(context).pop();
@@ -102,9 +110,15 @@ class _ShelvesState extends State<Shelves> {
                 );
               },
             ),
-            const ListTile(
-              leading: Icon(Icons.edit_outlined),
-              title: Text('Edit'),
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: Text('Edit', style: Theme.of(context).textTheme.bodyLarge),
+              onTap: () async {
+                await Navigator.of(context)
+                    .push(_createRoute(shelfId, shelfName));
+                refreshShelves();
+                Navigator.of(context).pop();
+              },
             ),
           ],
         );
@@ -115,47 +129,7 @@ class _ShelvesState extends State<Shelves> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          padding: const EdgeInsets.only(left: 12, top: 56, right: 12),
-          children: [
-            ListTile(
-              leading: const Icon(Icons.library_books_outlined),
-              selected: true,
-              title: const Text('Shelves'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.book_outlined),
-              title: const Text('Books'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            Divider(
-              height: 16,
-              thickness: 1,
-              indent: 8,
-              endIndent: 8,
-              color: Theme.of(context).colorScheme.outline,
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings_outlined),
-              title: const Text('Settings'),
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Settings(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: const MyDrawer(),
       appBar: AppBar(
         title: const Text('Shelves'),
       ),
@@ -214,18 +188,127 @@ class _ShelvesState extends State<Shelves> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_outlined),
         onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const EditShelf(),
-              fullscreenDialog: true,
-            ),
-          );
+          await Navigator.of(context).push(_createRoute(0, ''));
           refreshShelves();
         },
         label: const Text("add shelf"),
+      ),
+    );
+  }
+}
+
+Route _createRoute(int shelfId, String shelfName) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        EditShelf(shelfId, shelfName),
+    fullscreenDialog: true,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+class MyDrawer extends StatelessWidget {
+  const MyDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: const EdgeInsets.only(left: 12, top: 56, right: 12),
+        children: [
+          SizedBox(
+            height: 56,
+            child: ListTile(
+              leading: const Icon(Icons.library_books_outlined, size: 24),
+              selected: true,
+              title: Text('Shelves',
+                  style: Theme.of(context).textTheme.labelLarge),
+              onTap: () {
+                Navigator.pop(context);
+              },
+              contentPadding: const EdgeInsets.only(left: 16, right: 24),
+              textColor: Theme.of(context).colorScheme.onSurfaceVariant,
+              iconColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              selectedColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              selectedTileColor:
+                  Theme.of(context).colorScheme.secondaryContainer,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(24)),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 56,
+            child: ListTile(
+              leading: const Icon(Icons.book_outlined, size: 24),
+              selected: false,
+              title:
+                  Text('Books', style: Theme.of(context).textTheme.labelLarge),
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Books(),
+                  ),
+                );
+              },
+              contentPadding: const EdgeInsets.only(left: 16, right: 24),
+              textColor: Theme.of(context).colorScheme.onSurfaceVariant,
+              iconColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              selectedColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              selectedTileColor:
+                  Theme.of(context).colorScheme.secondaryContainer,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(24)),
+              ),
+            ),
+          ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            indent: 16,
+            endIndent: 16,
+            color: Theme.of(context).colorScheme.outline,
+          ),
+          SizedBox(
+            height: 56,
+            child: ListTile(
+              leading: const Icon(Icons.settings_outlined, size: 24),
+              selected: false,
+              title: Text('Settings',
+                  style: Theme.of(context).textTheme.labelLarge),
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Settings(),
+                  ),
+                );
+              },
+              contentPadding: const EdgeInsets.only(left: 16, right: 24),
+              textColor: Theme.of(context).colorScheme.onSurfaceVariant,
+              iconColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              selectedColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              selectedTileColor:
+                  Theme.of(context).colorScheme.secondaryContainer,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(24)),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

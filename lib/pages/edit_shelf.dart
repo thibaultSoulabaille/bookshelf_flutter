@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:bookshelf/model/shelf.dart';
 
-import '../db/shelves_database.dart';
+import '../db/bookshelf_database.dart';
 
 class EditShelf extends StatefulWidget {
-  const EditShelf({super.key});
+  final int shelfId;
+  final String shelfName;
+  const EditShelf(this.shelfId, this.shelfName, {super.key});
 
   @override
   State<EditShelf> createState() => _EditShelfState();
@@ -15,6 +17,8 @@ class _EditShelfState extends State<EditShelf> {
 
   @override
   Widget build(BuildContext context) {
+    int shelfId = widget.shelfId;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Shelf'),
@@ -43,6 +47,7 @@ class _EditShelfState extends State<EditShelf> {
               child: Column(
                 children: [
                   TextFormField(
+                    initialValue: shelfId == 0 ? null : widget.shelfName,
                     decoration: const InputDecoration(
                       // filled: true,
                       // fillColor: Theme.of(context).colorScheme.surfaceVariant,
@@ -56,10 +61,17 @@ class _EditShelfState extends State<EditShelf> {
                       return null;
                     },
                     onSaved: (val) => setState(() {
-                      ShelvesDatabase.instance.createShelf(Shelf(
-                        id: null,
-                        name: val!,
-                      ));
+                      if (shelfId == 0) {
+                        BookShelfDatabase.instance.createShelf(Shelf(
+                          id: null,
+                          name: val!,
+                        ));
+                      } else {
+                        BookShelfDatabase.instance.updateShelf(Shelf(
+                          id: shelfId,
+                          name: val!,
+                        ));
+                      }
                     }),
                   ),
                 ],
