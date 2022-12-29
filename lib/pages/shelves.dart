@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:bookshelf/db/bookshelf_database.dart';
+import 'package:flutter/material.dart';
 import 'package:bookshelf/model/shelf.dart';
 import 'package:bookshelf/pages/edit_shelf.dart';
 import 'package:bookshelf/pages/settings.dart';
@@ -151,38 +151,7 @@ class _ShelvesState extends State<Shelves> {
                 _showModalBottomSheet(
                     context, shelves[index].id!, shelves[index].name, 0);
               },
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          shelves[index].name,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        Flexible(
-                          child: Text(
-                            "0 books",
-                            style: Theme.of(context).textTheme.labelSmall,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text("BOOKS COVERS",
-                              style: Theme.of(context).textTheme.headlineLarge),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              child: ShelfListTile(shelves[index].name),
             );
           },
         ),
@@ -217,6 +186,48 @@ Route _createRoute(int shelfId, String shelfName) {
       );
     },
   );
+}
+
+class ShelfListTile extends StatelessWidget {
+  final String shelfName;
+
+  const ShelfListTile(this.shelfName, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                shelfName,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              Flexible(
+                child: Text(
+                  "0 books",
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text("BOOKS COVERS",
+                    style: Theme.of(context).textTheme.headlineLarge),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class MyDrawer extends StatelessWidget {

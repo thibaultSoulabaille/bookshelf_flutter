@@ -1,7 +1,6 @@
+import 'package:bookshelf/db/bookshelf_database.dart';
 import 'package:flutter/material.dart';
 import 'package:bookshelf/model/shelf.dart';
-
-import '../db/bookshelf_database.dart';
 
 class EditShelf extends StatefulWidget {
   final int shelfId;
