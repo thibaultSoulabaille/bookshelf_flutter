@@ -16,7 +16,7 @@ class Settings extends StatelessWidget {
         children: <Widget>[
           ListTile(
             contentPadding: const EdgeInsets.only(left: 16, top: 12, right: 24, bottom: 12),
-            leading: const Icon(Icons.palette_outlined),
+            leading: const Icon(Icons.palette_rounded),
             title: const Text('Theme'),
             subtitle: const Text('change application theme'),
             onTap: () async {

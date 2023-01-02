@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:bookshelf/db/bookshelf_database.dart';
 import 'package:bookshelf/pages/edit_book.dart';
 import 'package:flutter/material.dart';
 import 'package:bookshelf/model/book.dart';
+import '../model/author.dart';
+import 'add_to_shelf.dart';
 
 class Books extends StatefulWidget {
   const Books({Key? key}) : super(key: key);
@@ -12,32 +16,61 @@ class Books extends StatefulWidget {
 
 class _BooksState extends State<Books> {
   late List<Book> books;
+  late List<Author> authors;
+
   bool isLoading = false;
 
   @override
   void initState() {
     books = [];
+    authors = [];
     super.initState();
     refreshBooks();
   }
-
-  /*
-  @override
-  void dispose() {
-    BooksDatabase.instance.close();
-    super.dispose();
-  }*/
 
   Future refreshBooks() async {
     setState(() => isLoading = true);
 
     books = await BookShelfDatabase.instance.loadAllBooks();
+    authors = List<Author>.filled(
+        books.length, const Author(id: null, firstName: "", lastName: ""));
+
+    for (int i = 0; i < books.length; i++) {
+      authors[i] =
+          await BookShelfDatabase.instance.loadAuthor(books[i].authorId);
+    }
+
+    setState(() => isLoading = false);
+  }
+
+  Future<Author> loadAuthor(int authorId) async {
+    return await BookShelfDatabase.instance.loadAuthor(authorId);
+  }
+
+  Future cleanAuthors() async {
+    setState(() => isLoading = true);
+
+    List<Author> authors = await BookShelfDatabase.instance.loadAllAuthors();
+    for (int i = 0; i < authors.length; i++) {
+      int authorId = authors[i].id!;
+      List<Book> authorBooks =
+          await BookShelfDatabase.instance.loadBooksByAuthor(authorId);
+      if (authorBooks.isEmpty) {
+        await BookShelfDatabase.instance.deleteAuthor(authorId);
+      }
+    }
 
     setState(() => isLoading = false);
   }
 
   void _showModalBottomSheet(
-      BuildContext context, int bookId, String bookTitle, int bookPages) {
+      BuildContext context,
+      int bookId,
+      String bookTitle,
+      Uint8List bookCover,
+      int bookPages,
+      int bookReleaseDate,
+      String bookLanguage) {
     showModalBottomSheet<void>(
       context: context,
       builder: (context) {
@@ -67,7 +100,7 @@ class _BooksState extends State<Books> {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               subtitle: Text(
-                "$bookPages books",
+                "${DateTime.fromMillisecondsSinceEpoch(bookReleaseDate).year}",
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
@@ -77,7 +110,23 @@ class _BooksState extends State<Books> {
               endIndent: 16,
             ),
             ListTile(
-              leading: const Icon(Icons.delete_outlined),
+              leading: const Icon(Icons.my_library_add_rounded),
+              title: Text('Add to shelf',
+                  style: Theme.of(context).textTheme.bodyLarge),
+              onTap: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AddToShelf(
+                      bookId: bookId,
+                    ),
+                    fullscreenDialog: true,
+                  ),
+                );
+                Navigator.of(context).pop();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_rounded),
               title: Text(
                 'Delete',
                 style: Theme.of(context).textTheme.bodyLarge,
@@ -98,6 +147,9 @@ class _BooksState extends State<Books> {
                         onPressed: () {
                           BookShelfDatabase.instance.deleteBook(bookId);
                           refreshBooks();
+
+                          cleanAuthors();
+
                           Navigator.pop(context, 'OK');
                           Navigator.of(context).pop();
                         },
@@ -109,11 +161,11 @@ class _BooksState extends State<Books> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.edit_outlined),
+              leading: const Icon(Icons.edit_rounded),
               title: Text('Edit', style: Theme.of(context).textTheme.bodyLarge),
               onTap: () async {
-                await Navigator.of(context)
-                    .push(_createRoute(bookId, bookTitle, bookPages));
+                await Navigator.of(context).push(_createRoute(bookId, bookTitle,
+                    bookCover, bookPages, bookReleaseDate, bookLanguage));
                 refreshBooks();
                 Navigator.of(context).pop();
               },
@@ -131,16 +183,69 @@ class _BooksState extends State<Books> {
       appBar: AppBar(
         title: const Text('Books'),
       ),
+      /*body: Container(
+        padding: const EdgeInsets.all(16.0),
+        child: FutureBuilder<List<Book>>(
+          future: BookShelfDatabase.instance.loadAllBooks(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                  itemCount: snapshot.data?.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(snapshot.data![index].title,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18.0)),
+                          Image.memory(snapshot.data![index].cover),
+                          const Divider()
+                        ]);
+                  });
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            }
+            return Container(alignment: AlignmentDirectional.center,child: const CircularProgressIndicator(),);
+          },
+        ),
+      ),*/
       body: Scrollbar(
         child: ListView.builder(
-          itemCount: books.length,
+          itemCount: books.length * 2,
           itemBuilder: (context, i) {
+            if (i.isOdd) {
+              return const Padding(
+                padding: EdgeInsets.only(bottom: 8),
+              );
+            }
+
+            final index = i ~/ 2;
             return InkWell(
+              customBorder: RoundedRectangleBorder(
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                borderRadius: const BorderRadius.all(Radius.circular(12)),
+              ),
               onLongPress: () {
                 _showModalBottomSheet(
-                    context, books[i].id!, books[i].title, books[i].nPages);
+                    context,
+                    books[index].id!,
+                    books[index].title,
+                    books[index].cover,
+                    books[index].nPages,
+                    books[index].releaseDateTimestamp,
+                    books[index].language);
               },
-              child: BookListTile(books[i].title, books[i].nPages),
+              child: BookListTile(
+                  books[index].title,
+                  books[index].cover,
+                  authors[index].firstName,
+                  authors[index].lastName,
+                  books[index].nPages,
+                  DateTime.fromMillisecondsSinceEpoch(
+                          books[index].releaseDateTimestamp)
+                      .year),
             );
           },
         ),
@@ -148,7 +253,9 @@ class _BooksState extends State<Books> {
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add_rounded),
         onPressed: () async {
-          await Navigator.of(context).push(_createRoute(0, '', 0));
+          await Navigator.of(context)
+              .push(_createRoute(0, '', Uint8List.fromList([]), 0, 0, ''));
+          refreshBooks();
         },
         label: const Text("add book"),
       ),
@@ -158,18 +265,22 @@ class _BooksState extends State<Books> {
 
 class BookListTile extends StatelessWidget {
   final String bookTitle;
+  final Uint8List bookCover;
+  final String authorFirstName;
+  final String authorLastName;
   final int bookPages;
+  final int bookReleaseYear;
 
-  const BookListTile(this.bookTitle, this.bookPages, {super.key});
+  const BookListTile(this.bookTitle, this.bookCover, this.authorFirstName,
+      this.authorLastName, this.bookPages, this.bookReleaseYear,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(
-        left: 8,
-        right: 8,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Card(
             elevation: 0,
@@ -180,37 +291,55 @@ class BookListTile extends StatelessWidget {
               ),
               borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        bookTitle,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Text(
-                        "Firstname Surname",
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      Text(
-                        "1985",
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      bottomLeft: Radius.circular(12)), // Image border
+                  child: SizedBox(
+                    width: 75,
+                    // height: 120,
+                    // Image radius
+                    child: Image.memory(
+                      bookCover,
+                      gaplessPlayback: true,
+                    ),
                   ),
-                  Flexible(
-                    child: Text(
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 16),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      bookTitle,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      "$authorFirstName $authorLastName",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    Text(
+                      bookReleaseYear.toString(),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    Text(
                       "$bookPages pages",
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
+                  ],
+                ),
+                /*Flexible(
+                  child: Text(
+                    "$bookPages pages",
+                    style: Theme.of(context).textTheme.labelSmall,
                   ),
-                ],
-              ),
+                ),*/
+              ],
             ),
           ),
         ],
@@ -219,10 +348,11 @@ class BookListTile extends StatelessWidget {
   }
 }
 
-Route _createRoute(int bookId, String bookTitle, int bookPages) {
+Route _createRoute(int bookId, String bookTitle, Uint8List bookCover,
+    int bookPages, int bookReleaseDate, String bookLanguage) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        EditBook(bookId, bookTitle, bookPages),
+    pageBuilder: (context, animation, secondaryAnimation) => EditBook(
+        bookId, bookTitle, bookCover, bookPages, bookReleaseDate, bookLanguage),
     fullscreenDialog: true,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);

@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:bookshelf/model/shelf.dart';
 import 'package:bookshelf/model/book.dart';
+
+import '../model/author.dart';
 
 class BookShelfDatabase {
   // instance of shelve database
@@ -36,17 +40,23 @@ class BookShelfDatabase {
         );
         db.execute(
           '''
-          CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT NOT NULL, n_pages INTEGER NOT NULL);
+          CREATE TABLE books(id INTEGER PRIMARY KEY, shelf_id INTEGER, title TEXT NOT NULL, cover BLOB NOT NULL, author_id INTEGER NOT NULL, n_pages INTEGER NOT NULL, release_date INTEGER NOT NULL, language TEXT NOT NULL);
+          ''',
+        );
+        db.execute(
+          '''
+          CREATE TABLE authors(id INTEGER PRIMARY KEY, first_name TEXT NOT NULL, last_name NOT NULL);
           ''',
         );
       },
 
       // Set the version. This executes the onCreate function and provides a
       // path to perform database upgrades and downgrades.
-      version: 3,
+      version: 6,
     );
   }
 
+  // SHELF FUNCTIONS
   Future<void> createShelf(Shelf shelve) async {
     final db = await instance.database;
 
@@ -124,7 +134,17 @@ class BookShelfDatabase {
     );
   }
 
+  Future<int> getShelfLength(int id) async {
+    // Get a reference to the database.
+    final db = await instance.database;
 
+    final List<Map<String, dynamic>> maps =
+        await db.query('books', where: 'shelf_id = ?', whereArgs: [id]);
+
+    return maps.length;
+  }
+
+  // BOOK FUNCTIONS
   Future<void> createBook(Book book) async {
     final db = await instance.database;
 
@@ -156,15 +176,20 @@ class BookShelfDatabase {
     // Query the table for all the Shelves
     final List<Map<String, dynamic>> maps = await db.query(
       'books',
-      orderBy: 'title',
+      orderBy: 'release_date',
     );
 
     // Convert the List<Map<String, dynamic> into a List<Shelves>
     return List.generate(maps.length, (i) {
       return Book(
         id: maps[i]['id'],
+        shelfId: maps[i]['shelf_id'],
         title: maps[i]['title'],
+        cover: maps[i]['cover'],
+        authorId: maps[i]['author_id'],
         nPages: maps[i]['n_pages'],
+        releaseDateTimestamp: maps[i]['release_date'],
+        language: maps[i]['language'],
       );
     });
   }
@@ -182,12 +207,42 @@ class BookShelfDatabase {
     if (maps.isNotEmpty) {
       return Book(
         id: maps[0]['id'] as int?,
+        shelfId: maps[0]['shelf_id'] as int?,
         title: maps[0]['title'] as String,
+        cover: maps[0]['cover'] as Uint8List,
+        authorId: maps[0]['author_id'] as int,
         nPages: maps[0]['n_pages'] as int,
+        releaseDateTimestamp: maps[0]['release_date'] as int,
+        language: maps[0]['language'] as String,
       );
     } else {
       throw Exception("Access error : No book with given id");
     }
+  }
+
+  Future<List<Book>> loadBooksByAuthor(int authorId) async {
+    final db = await instance.database;
+
+    // Query the table for all the Books
+    final List<Map<String, dynamic>> maps = await db.query(
+      'books',
+      where: 'author_id = ?',
+      whereArgs: [authorId],
+    );
+
+    // Convert the List<Map<String, dynamic> into a List<Books>
+    return List.generate(maps.length, (i) {
+      return Book(
+        id: maps[i]['id'],
+        shelfId: maps[i]['shelf_id'],
+        authorId: maps[i]['author_id'],
+        title: maps[i]['title'],
+        cover: maps[i]['cover'],
+        nPages: maps[i]['n_pages'],
+        releaseDateTimestamp: maps[i]['release_date'],
+        language: maps[i]['language'],
+      );
+    });
   }
 
   Future<void> deleteBook(int id) async {
@@ -200,6 +255,71 @@ class BookShelfDatabase {
       // Use a `where` clause to delete a specific dog.
       where: 'id = ?',
       // Pass the Shelf's id as a whereArg to prevent SQL injection.
+      whereArgs: [id],
+    );
+  }
+
+  // AUTHOR FUNCTIONS
+  Future<int> createAuthor(Author author) async {
+    final db = await instance.database;
+
+    return await db.insert(
+      'authors',
+      author.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  Future<List<Author>> loadAllAuthors() async {
+    final db = await instance.database;
+
+    // Query the table for all the Authors
+    final List<Map<String, dynamic>> maps = await db.query(
+      'authors',
+      orderBy: 'last_name',
+    );
+
+    // Convert the List<Map<String, dynamic> into a List<Author>
+    return List.generate(maps.length, (i) {
+      return Author(
+        id: maps[i]['id'],
+        firstName: maps[i]['first_name'],
+        lastName: maps[i]['last_name'],
+      );
+    });
+  }
+
+  Future<Author> loadAuthor(int id) async {
+    final db = await instance.database;
+
+    // Query the table for all the Authors
+    final maps = await db.query(
+      'authors',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Author(
+        id: maps[0]['id'] as int?,
+        firstName: maps[0]['first_name'] as String,
+        lastName: maps[0]['last_name'] as String,
+      );
+    } else {
+      throw Exception("Access error : No author with given id");
+    }
+  }
+
+  Future<void> deleteAuthor(int id) async {
+    // Get a reference to the database.
+    final db = await instance.database;
+
+    // Remove the Author from the database.
+    await db.delete(
+      'authors',
+      // Use a `where` clause to delete a specific author.
+      where: 'id = ?',
+      // Pass the Author's id as a whereArg to prevent SQL injection.
       whereArgs: [id],
     );
   }

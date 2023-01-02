@@ -66,41 +66,42 @@ const lightColorScheme = ColorScheme(
   surfaceTint: Color(0xFFA13E39),
 );*/
 
-/*
+
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
-  primary: Color(0xFF49670B),
+  primary: Color(0xFF346A21),
   onPrimary: Color(0xFFFFFFFF),
-  primaryContainer: Color(0xFFCAEF87),
-  onPrimaryContainer: Color(0xFF131F00),
-  secondary: Color(0xFF596248),
+  primaryContainer: Color(0xFFB5F399),
+  onPrimaryContainer: Color(0xFF042100),
+  secondary: Color(0xFF55624C),
   onSecondary: Color(0xFFFFFFFF),
-  secondaryContainer: Color(0xFFDDE6C6),
-  onSecondaryContainer: Color(0xFF171E0A),
-  tertiary: Color(0xFF396661),
+  secondaryContainer: Color(0xFFD8E7CB),
+  onSecondaryContainer: Color(0xFF131F0D),
+  tertiary: Color(0xFF386667),
   onTertiary: Color(0xFFFFFFFF),
-  tertiaryContainer: Color(0xFFBCECE5),
-  onTertiaryContainer: Color(0xFF00201D),
+  tertiaryContainer: Color(0xFFBCEBED),
+  onTertiaryContainer: Color(0xFF002021),
   error: Color(0xFFBA1A1A),
   errorContainer: Color(0xFFFFDAD6),
   onError: Color(0xFFFFFFFF),
   onErrorContainer: Color(0xFF410002),
-  background: Color(0xFFFEFCF4),
-  onBackground: Color(0xFF1B1C17),
-  surface: Color(0xFFFEFCF4),
-  onSurface: Color(0xFF1B1C17),
-  surfaceVariant: Color(0xFFE2E4D4),
-  onSurfaceVariant: Color(0xFF45483D),
-  outline: Color(0xFF75786B),
-  onInverseSurface: Color(0xFFF2F1E9),
-  inverseSurface: Color(0xFF30312C),
-  inversePrimary: Color(0xFFAFD36E),
+  background: Color(0xFFFDFDF6),
+  onBackground: Color(0xFF1A1C18),
+  surface: Color(0xFFFDFDF6),
+  onSurface: Color(0xFF1A1C18),
+  surfaceVariant: Color(0xFFDFE4D7),
+  onSurfaceVariant: Color(0xFF43483F),
+  outline: Color(0xFF73796E),
+  onInverseSurface: Color(0xFFF1F1EA),
+  inverseSurface: Color(0xFF2F312D),
+  inversePrimary: Color(0xFF9AD680),
   shadow: Color(0xFF000000),
-  surfaceTint: Color(0xFF49670B),
-  // outlineVariant: Color(0xFFC5C8B9),
+  surfaceTint: Color(0xFF346A21),
+  // outlineVariant: Color(0xFFC3C8BB),
   // scrim: Color(0xFF000000),
-);*/
+);
 
+/* BLUE
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
   primary: Color(0xFF006590),
@@ -131,4 +132,4 @@ const lightColorScheme = ColorScheme(
   inversePrimary: Color(0xFF89CEFF),
   shadow: Color(0xFF000000),
   surfaceTint: Color(0xFF006590),
-);
+);*/

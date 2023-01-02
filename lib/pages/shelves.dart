@@ -15,11 +15,14 @@ class Shelves extends StatefulWidget {
 
 class _ShelvesState extends State<Shelves> {
   late List<Shelf> shelves;
+  late List<int> shelvesLength;
+
   bool isLoading = false;
 
   @override
   void initState() {
     shelves = [];
+    shelvesLength = [];
     super.initState();
     refreshShelves();
   }
@@ -34,6 +37,11 @@ class _ShelvesState extends State<Shelves> {
     setState(() => isLoading = true);
 
     shelves = await BookShelfDatabase.instance.loadAllShelves();
+    shelvesLength = List<int>.filled(shelves.length, 0);
+
+    for (int i=0; i<shelves.length; i++) {
+      shelvesLength[i] = await BookShelfDatabase.instance.getShelfLength(shelves[i].id!);
+    }
 
     setState(() => isLoading = false);
   }
@@ -73,13 +81,12 @@ class _ShelvesState extends State<Shelves> {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
-            Divider(
-              color: Theme.of(context).colorScheme.outline,
+            const Divider(
               indent: 16,
               endIndent: 16,
             ),
             ListTile(
-              leading: const Icon(Icons.delete_outlined),
+              leading: const Icon(Icons.delete_rounded),
               title: Text(
                 'Delete',
                 style: Theme.of(context).textTheme.bodyLarge,
@@ -111,7 +118,7 @@ class _ShelvesState extends State<Shelves> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.edit_outlined),
+              leading: const Icon(Icons.edit_rounded),
               title: Text('Edit', style: Theme.of(context).textTheme.bodyLarge),
               onTap: () async {
                 await Navigator.of(context)
@@ -138,10 +145,9 @@ class _ShelvesState extends State<Shelves> {
           itemCount: shelves.length * 2,
           itemBuilder: (context, i) {
             if (i.isOdd) {
-              return Divider(
+              return const Divider(
                 height: 1,
                 thickness: 1,
-                color: Theme.of(context).colorScheme.outline,
               );
             }
 
@@ -151,13 +157,13 @@ class _ShelvesState extends State<Shelves> {
                 _showModalBottomSheet(
                     context, shelves[index].id!, shelves[index].name, 0);
               },
-              child: ShelfListTile(shelves[index].name),
+              child: ShelfListTile(shelves[index].name, shelvesLength[index]),
             );
           },
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add_outlined),
+        icon: const Icon(Icons.add_rounded),
         onPressed: () async {
           await Navigator.of(context).push(_createRoute(0, ''));
           refreshShelves();
@@ -190,8 +196,9 @@ Route _createRoute(int shelfId, String shelfName) {
 
 class ShelfListTile extends StatelessWidget {
   final String shelfName;
+  final int shelfLength;
 
-  const ShelfListTile(this.shelfName, {super.key});
+  const ShelfListTile(this.shelfName, this.shelfLength, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +216,7 @@ class ShelfListTile extends StatelessWidget {
               ),
               Flexible(
                 child: Text(
-                  "0 books",
+                  "$shelfLength books",
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
               ),
@@ -242,7 +249,7 @@ class MyDrawer extends StatelessWidget {
           SizedBox(
             height: 56,
             child: ListTile(
-              leading: const Icon(Icons.library_books_outlined, size: 24),
+              leading: const Icon(Icons.library_books_rounded, size: 24),
               selected: true,
               title: Text('Shelves',
                   style: Theme.of(context).textTheme.labelLarge),
@@ -263,7 +270,7 @@ class MyDrawer extends StatelessWidget {
           SizedBox(
             height: 56,
             child: ListTile(
-              leading: const Icon(Icons.book_outlined, size: 24),
+              leading: const Icon(Icons.book_rounded, size: 24),
               selected: false,
               title:
                   Text('Books', style: Theme.of(context).textTheme.labelLarge),
@@ -286,17 +293,34 @@ class MyDrawer extends StatelessWidget {
               ),
             ),
           ),
-          Divider(
+          SizedBox(
+            height: 56,
+            child: ListTile(
+              leading: const Icon(Icons.schedule_rounded, size: 24),
+              title: Text('Wishlist',
+                  style: Theme.of(context).textTheme.labelLarge),
+              onTap: () {
+              },
+              contentPadding: const EdgeInsets.only(left: 16, right: 24),
+              textColor: Theme.of(context).colorScheme.onSurfaceVariant,
+              iconColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              selectedColor: Theme.of(context).colorScheme.onSecondaryContainer,
+              selectedTileColor:
+              Theme.of(context).colorScheme.secondaryContainer,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(24)),
+              ),
+            ),
+          ),
+          const Divider(
             height: 1,
-            thickness: 1,
             indent: 16,
             endIndent: 16,
-            color: Theme.of(context).colorScheme.outline,
           ),
           SizedBox(
             height: 56,
             child: ListTile(
-              leading: const Icon(Icons.settings_outlined, size: 24),
+              leading: const Icon(Icons.settings_rounded, size: 24),
               selected: false,
               title: Text('Settings',
                   style: Theme.of(context).textTheme.labelLarge),

@@ -35,31 +35,28 @@ class _EditShelfState extends State<EditShelf> {
         ],
       ),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         child: Builder(
           builder: (context) => Form(
             key: _formKey,
-            child: Container(
-              margin: const EdgeInsets.only(
-                top: 16,
-              ),
-              child: Column(
-                children: [
-                  TextFormField(
-                    initialValue: shelfId == 0 ? null : widget.shelfName,
-                    decoration: const InputDecoration(
-                      // filled: true,
-                      // fillColor: Theme.of(context).colorScheme.surfaceVariant,
-                      labelText: 'Shelf name',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the shelf name.';
-                      }
-                      return null;
-                    },
-                    onSaved: (val) => setState(() {
+            child: Column(
+              children: [
+                TextFormField(
+                  initialValue: shelfId == 0 ? null : widget.shelfName,
+                  decoration: const InputDecoration(
+                    // filled: true,
+                    // fillColor: Theme.of(context).colorScheme.surfaceVariant,
+                    labelText: 'Shelf name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the shelf name.';
+                    }
+                    return null;
+                  },
+                  onSaved: (val) => setState(
+                    () {
                       if (shelfId == 0) {
                         BookShelfDatabase.instance.createShelf(Shelf(
                           id: null,
@@ -71,10 +68,10 @@ class _EditShelfState extends State<EditShelf> {
                           name: val!,
                         ));
                       }
-                    }),
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
