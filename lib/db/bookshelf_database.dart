@@ -245,6 +245,31 @@ class BookShelfDatabase {
     });
   }
 
+  Future<List<Book>> loadBooksByShelf(int shelfId) async {
+    final db = await instance.database;
+
+    // Query the table for all the Books
+    final List<Map<String, dynamic>> maps = await db.query(
+      'books',
+      where: 'shelf_id = ?',
+      whereArgs: [shelfId],
+    );
+
+    // Convert the List<Map<String, dynamic> into a List<Books>
+    return List.generate(maps.length, (i) {
+      return Book(
+        id: maps[i]['id'],
+        shelfId: maps[i]['shelf_id'],
+        authorId: maps[i]['author_id'],
+        title: maps[i]['title'],
+        cover: maps[i]['cover'],
+        nPages: maps[i]['n_pages'],
+        releaseDateTimestamp: maps[i]['release_date'],
+        language: maps[i]['language'],
+      );
+    });
+  }
+
   Future<void> deleteBook(int id) async {
     // Get a reference to the database.
     final db = await instance.database;

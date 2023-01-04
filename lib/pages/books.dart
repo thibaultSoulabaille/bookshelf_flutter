@@ -68,6 +68,8 @@ class _BooksState extends State<Books> {
       int bookId,
       String bookTitle,
       Uint8List bookCover,
+      String authorFirstName,
+      String authorLastName,
       int bookPages,
       int bookReleaseDate,
       String bookLanguage) {
@@ -104,8 +106,7 @@ class _BooksState extends State<Books> {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
-            Divider(
-              color: Theme.of(context).colorScheme.outline,
+            const Divider(
               indent: 16,
               endIndent: 16,
             ),
@@ -164,8 +165,15 @@ class _BooksState extends State<Books> {
               leading: const Icon(Icons.edit_rounded),
               title: Text('Edit', style: Theme.of(context).textTheme.bodyLarge),
               onTap: () async {
-                await Navigator.of(context).push(_createRoute(bookId, bookTitle,
-                    bookCover, bookPages, bookReleaseDate, bookLanguage));
+                await Navigator.of(context).push(_createRoute(
+                    bookId,
+                    bookTitle,
+                    bookCover,
+                    authorFirstName,
+                    authorLastName,
+                    bookPages,
+                    bookReleaseDate,
+                    bookLanguage));
                 refreshBooks();
                 Navigator.of(context).pop();
               },
@@ -233,6 +241,8 @@ class _BooksState extends State<Books> {
                     books[index].id!,
                     books[index].title,
                     books[index].cover,
+                    authors[index].firstName,
+                    authors[index].lastName,
                     books[index].nPages,
                     books[index].releaseDateTimestamp,
                     books[index].language);
@@ -253,8 +263,8 @@ class _BooksState extends State<Books> {
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add_rounded),
         onPressed: () async {
-          await Navigator.of(context)
-              .push(_createRoute(0, '', Uint8List.fromList([]), 0, 0, ''));
+          await Navigator.of(context).push(
+              _createRoute(0, '', Uint8List.fromList([]), '', '', 0, 0, ''));
           refreshBooks();
         },
         label: const Text("add book"),
@@ -284,7 +294,10 @@ class BookListTile extends StatelessWidget {
         children: [
           Card(
             elevation: 0,
-            color: Theme.of(context).colorScheme.surface,
+            color: ElevationOverlay.applySurfaceTint(
+                Theme.of(context).colorScheme.surface,
+                Theme.of(context).colorScheme.surfaceTint,
+                0),
             shape: RoundedRectangleBorder(
               side: BorderSide(
                 color: Theme.of(context).colorScheme.outline,
@@ -297,8 +310,11 @@ class BookListTile extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      bottomLeft: Radius.circular(12)), // Image border
+                    topLeft: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                    bottomRight: Radius.circular(12),
+                  ), // Image border
                   child: SizedBox(
                     width: 75,
                     // height: 120,
@@ -333,12 +349,6 @@ class BookListTile extends StatelessWidget {
                     ),
                   ],
                 ),
-                /*Flexible(
-                  child: Text(
-                    "$bookPages pages",
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                ),*/
               ],
             ),
           ),
@@ -348,11 +358,25 @@ class BookListTile extends StatelessWidget {
   }
 }
 
-Route _createRoute(int bookId, String bookTitle, Uint8List bookCover,
-    int bookPages, int bookReleaseDate, String bookLanguage) {
+Route _createRoute(
+    int bookId,
+    String bookTitle,
+    Uint8List bookCover,
+    String authorFirstName,
+    String authorLastName,
+    int bookPages,
+    int bookReleaseDate,
+    String bookLanguage) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => EditBook(
-        bookId, bookTitle, bookCover, bookPages, bookReleaseDate, bookLanguage),
+        bookId,
+        bookTitle,
+        bookCover,
+        authorFirstName,
+        authorLastName,
+        bookPages,
+        bookReleaseDate,
+        bookLanguage),
     fullscreenDialog: true,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);

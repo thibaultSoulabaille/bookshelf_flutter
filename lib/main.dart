@@ -84,8 +84,9 @@ ThemeData themeData(ColorScheme colorScheme) {
     ),
     dialogBackgroundColor: ElevationOverlay.applySurfaceTint(
         colorScheme.surface, colorScheme.surfaceTint, 3),
-    dividerTheme: const DividerThemeData(
+    dividerTheme: DividerThemeData(
       thickness: 1,
+      color: colorScheme==darkColorScheme ? const Color(0xFF43483F) : const Color(0xFFC3C8BB),
     ),
     radioTheme: RadioThemeData(
       fillColor: MaterialStateColor.resolveWith((states) =>

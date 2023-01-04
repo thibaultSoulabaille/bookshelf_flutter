@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:bookshelf/model/shelf.dart';
 import 'package:bookshelf/pages/edit_shelf.dart';
 import 'package:bookshelf/pages/settings.dart';
+import 'package:bookshelf/pages/test.dart';
 
+import '../model/book.dart';
 import 'books.dart';
 
 class Shelves extends StatefulWidget {
@@ -39,8 +41,9 @@ class _ShelvesState extends State<Shelves> {
     shelves = await BookShelfDatabase.instance.loadAllShelves();
     shelvesLength = List<int>.filled(shelves.length, 0);
 
-    for (int i=0; i<shelves.length; i++) {
-      shelvesLength[i] = await BookShelfDatabase.instance.getShelfLength(shelves[i].id!);
+    for (int i = 0; i < shelves.length; i++) {
+      shelvesLength[i] =
+          await BookShelfDatabase.instance.getShelfLength(shelves[i].id!);
     }
 
     setState(() => isLoading = false);
@@ -147,7 +150,6 @@ class _ShelvesState extends State<Shelves> {
             if (i.isOdd) {
               return const Divider(
                 height: 1,
-                thickness: 1,
               );
             }
 
@@ -157,7 +159,8 @@ class _ShelvesState extends State<Shelves> {
                 _showModalBottomSheet(
                     context, shelves[index].id!, shelves[index].name, 0);
               },
-              child: ShelfListTile(shelves[index].name, shelvesLength[index]),
+              child: ShelfListTile(shelves[index].id!, shelves[index].name,
+                  shelvesLength[index]),
             );
           },
         ),
@@ -195,10 +198,12 @@ Route _createRoute(int shelfId, String shelfName) {
 }
 
 class ShelfListTile extends StatelessWidget {
+  final int shelfId;
   final String shelfName;
   final int shelfLength;
 
-  const ShelfListTile(this.shelfName, this.shelfLength, {super.key});
+  const ShelfListTile(this.shelfId, this.shelfName, this.shelfLength,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -212,24 +217,41 @@ class ShelfListTile extends StatelessWidget {
             children: [
               Text(
                 shelfName,
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               Flexible(
                 child: Text(
                   "$shelfLength books",
-                  style: Theme.of(context).textTheme.labelSmall,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
             ],
           ),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text("BOOKS COVERS",
-                    style: Theme.of(context).textTheme.headlineLarge),
-              ),
-            ],
+          const Padding(
+            padding: EdgeInsets.only(bottom: 8),
+          ),
+          SizedBox(
+            height: 120.0,
+            child: FutureBuilder<List<Book>>(
+              future: BookShelfDatabase.instance.loadBooksByShelf(shelfId),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: snapshot.data!.length < 10 ? snapshot.data?.length : 10,
+                    itemBuilder: (context, index) {
+                      return Image.memory(snapshot.data![index].cover);
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                }
+                return Container(
+                  alignment: AlignmentDirectional.center,
+                  child: const CircularProgressIndicator(),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -299,14 +321,20 @@ class MyDrawer extends StatelessWidget {
               leading: const Icon(Icons.schedule_rounded, size: 24),
               title: Text('Wishlist',
                   style: Theme.of(context).textTheme.labelLarge),
-              onTap: () {
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyApp(),
+                  ),
+                );
               },
               contentPadding: const EdgeInsets.only(left: 16, right: 24),
               textColor: Theme.of(context).colorScheme.onSurfaceVariant,
               iconColor: Theme.of(context).colorScheme.onSecondaryContainer,
               selectedColor: Theme.of(context).colorScheme.onSecondaryContainer,
               selectedTileColor:
-              Theme.of(context).colorScheme.secondaryContainer,
+                  Theme.of(context).colorScheme.secondaryContainer,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(24)),
               ),
