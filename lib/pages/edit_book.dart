@@ -105,6 +105,7 @@ class _EditBookState extends State<EditBook> {
                       nPages: bookPages,
                       releaseDateTimestamp: bookReleaseDate,
                       language: bookLanguage,
+                      readingStatus: 0,
                     ),
                   );
                 } else {
@@ -118,6 +119,7 @@ class _EditBookState extends State<EditBook> {
                       nPages: bookPages,
                       releaseDateTimestamp: bookReleaseDate,
                       language: bookLanguage,
+                      readingStatus: 2,
                     ),
                   );
                 }

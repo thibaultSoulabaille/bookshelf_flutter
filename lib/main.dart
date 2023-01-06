@@ -86,7 +86,7 @@ ThemeData themeData(ColorScheme colorScheme) {
         colorScheme.surface, colorScheme.surfaceTint, 3),
     dividerTheme: DividerThemeData(
       thickness: 1,
-      color: colorScheme==darkColorScheme ? const Color(0xFF43483F) : const Color(0xFFC3C8BB),
+      color: colorScheme==darkColorScheme ? const Color(0xFF40484C) : const Color(0xFFBFC8CC),
     ),
     radioTheme: RadioThemeData(
       fillColor: MaterialStateColor.resolveWith((states) =>

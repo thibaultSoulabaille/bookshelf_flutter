@@ -40,7 +40,7 @@ class BookShelfDatabase {
         );
         db.execute(
           '''
-          CREATE TABLE books(id INTEGER PRIMARY KEY, shelf_id INTEGER, title TEXT NOT NULL, cover BLOB NOT NULL, author_id INTEGER NOT NULL, n_pages INTEGER NOT NULL, release_date INTEGER NOT NULL, language TEXT NOT NULL);
+          CREATE TABLE books(id INTEGER PRIMARY KEY, shelf_id INTEGER, title TEXT NOT NULL, cover BLOB NOT NULL, author_id INTEGER NOT NULL, n_pages INTEGER NOT NULL, release_date INTEGER NOT NULL, language TEXT NOT NULL, reading_status INTEGER NOT NULL, started_reading_date INTEGER, ended_reading_date INTEGER);
           ''',
         );
         db.execute(
@@ -190,6 +190,9 @@ class BookShelfDatabase {
         nPages: maps[i]['n_pages'],
         releaseDateTimestamp: maps[i]['release_date'],
         language: maps[i]['language'],
+        startedReadingDateTimestamp: maps[i]['started_reading_date'],
+        endedReadingDateTimestamp: maps[i]['ended_reading_date'],
+        readingStatus: maps[i]['reading_status'],
       );
     });
   }
@@ -214,6 +217,9 @@ class BookShelfDatabase {
         nPages: maps[0]['n_pages'] as int,
         releaseDateTimestamp: maps[0]['release_date'] as int,
         language: maps[0]['language'] as String,
+        startedReadingDateTimestamp: maps[0]['started_reading_date'] as int?,
+        endedReadingDateTimestamp: maps[0]['ended_reading_date'] as int?,
+        readingStatus: maps[0]['reading_status'] as int,
       );
     } else {
       throw Exception("Access error : No book with given id");
@@ -228,6 +234,7 @@ class BookShelfDatabase {
       'books',
       where: 'author_id = ?',
       whereArgs: [authorId],
+      orderBy: 'release_date',
     );
 
     // Convert the List<Map<String, dynamic> into a List<Books>
@@ -241,6 +248,9 @@ class BookShelfDatabase {
         nPages: maps[i]['n_pages'],
         releaseDateTimestamp: maps[i]['release_date'],
         language: maps[i]['language'],
+        startedReadingDateTimestamp: maps[i]['started_reading_date'],
+        endedReadingDateTimestamp: maps[i]['ended_reading_date'],
+        readingStatus: maps[i]['reading_status'],
       );
     });
   }
@@ -253,6 +263,7 @@ class BookShelfDatabase {
       'books',
       where: 'shelf_id = ?',
       whereArgs: [shelfId],
+      orderBy: 'release_date',
     );
 
     // Convert the List<Map<String, dynamic> into a List<Books>
@@ -266,6 +277,9 @@ class BookShelfDatabase {
         nPages: maps[i]['n_pages'],
         releaseDateTimestamp: maps[i]['release_date'],
         language: maps[i]['language'],
+        startedReadingDateTimestamp: maps[i]['started_reading_date'],
+        endedReadingDateTimestamp: maps[i]['ended_reading_date'],
+        readingStatus: maps[i]['reading_status'],
       );
     });
   }

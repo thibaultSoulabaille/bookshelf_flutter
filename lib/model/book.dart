@@ -9,6 +9,9 @@ class Book {
   final int nPages;
   final int releaseDateTimestamp;
   final String language;
+  final int? startedReadingDateTimestamp;
+  final int? endedReadingDateTimestamp;
+  final int readingStatus;
 
   const Book({
     required this.id,
@@ -19,7 +22,10 @@ class Book {
     required this.nPages,
     required this.releaseDateTimestamp,
     required this.language,
-  });
+    required this.readingStatus,
+    this.startedReadingDateTimestamp,
+    this.endedReadingDateTimestamp,
+});
 
   Map<String, dynamic> toMap() {
     return {
@@ -31,6 +37,9 @@ class Book {
       'n_pages': nPages,
       'release_date': releaseDateTimestamp,
       'language': language,
+      'reading_status': readingStatus,
+      'started_reading_date': startedReadingDateTimestamp,
+      'ended_reading_date': endedReadingDateTimestamp,
     };
   }
 

@@ -66,7 +66,7 @@ const lightColorScheme = ColorScheme(
   surfaceTint: Color(0xFFA13E39),
 );*/
 
-
+/*
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
   primary: Color(0xFF346A21),
@@ -99,37 +99,38 @@ const lightColorScheme = ColorScheme(
   surfaceTint: Color(0xFF346A21),
   // outlineVariant: Color(0xFFC3C8BB),
   // scrim: Color(0xFF000000),
-);
+);*/
 
-/* BLUE
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,
-  primary: Color(0xFF006590),
+  primary: Color(0xFF00677E),
   onPrimary: Color(0xFFFFFFFF),
-  primaryContainer: Color(0xFFC8E6FF),
-  onPrimaryContainer: Color(0xFF001E2F),
-  secondary: Color(0xFF4F606E),
+  primaryContainer: Color(0xFFB5EBFF),
+  onPrimaryContainer: Color(0xFF001F28),
+  secondary: Color(0xFF4C626A),
   onSecondary: Color(0xFFFFFFFF),
-  secondaryContainer: Color(0xFFD3E5F5),
-  onSecondaryContainer: Color(0xFF0B1D29),
-  tertiary: Color(0xFF64597C),
+  secondaryContainer: Color(0xFFCFE6F0),
+  onSecondaryContainer: Color(0xFF071E26),
+  tertiary: Color(0xFF595C7E),
   onTertiary: Color(0xFFFFFFFF),
-  tertiaryContainer: Color(0xFFEADDFF),
-  onTertiaryContainer: Color(0xFF1F1635),
+  tertiaryContainer: Color(0xFFE0E0FF),
+  onTertiaryContainer: Color(0xFF161937),
   error: Color(0xFFBA1A1A),
   errorContainer: Color(0xFFFFDAD6),
   onError: Color(0xFFFFFFFF),
   onErrorContainer: Color(0xFF410002),
-  background: Color(0xFFFCFCFF),
-  onBackground: Color(0xFF191C1E),
-  surface: Color(0xFFFCFCFF),
-  onSurface: Color(0xFF191C1E),
-  surfaceVariant: Color(0xFFDDE3EA),
-  onSurfaceVariant: Color(0xFF41474D),
-  outline: Color(0xFF71787E),
-  onInverseSurface: Color(0xFFF0F0F3),
-  inverseSurface: Color(0xFF2E3133),
-  inversePrimary: Color(0xFF89CEFF),
+  background: Color(0xFFFBFCFE),
+  onBackground: Color(0xFF191C1D),
+  surface: Color(0xFFFBFCFE),
+  onSurface: Color(0xFF191C1D),
+  surfaceVariant: Color(0xFFDBE4E8),
+  onSurfaceVariant: Color(0xFF40484C),
+  outline: Color(0xFF70787C),
+  onInverseSurface: Color(0xFFEFF1F2),
+  inverseSurface: Color(0xFF2E3132),
+  inversePrimary: Color(0xFF5BD5FA),
   shadow: Color(0xFF000000),
-  surfaceTint: Color(0xFF006590),
-);*/
+  surfaceTint: Color(0xFF00677E),
+  // outlineVariant: Color(0xFFBFC8CC),
+  // scrim: Color(0xFF000000),
+);

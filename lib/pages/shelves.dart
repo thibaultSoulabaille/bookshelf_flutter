@@ -145,22 +145,15 @@ class _ShelvesState extends State<Shelves> {
       ),
       body: Scrollbar(
         child: ListView.builder(
-          itemCount: shelves.length * 2,
+          itemCount: shelves.length,
           itemBuilder: (context, i) {
-            if (i.isOdd) {
-              return const Divider(
-                height: 1,
-              );
-            }
-
-            final index = i ~/ 2;
             return InkWell(
               onLongPress: () {
                 _showModalBottomSheet(
-                    context, shelves[index].id!, shelves[index].name, 0);
+                    context, shelves[i].id!, shelves[i].name, shelvesLength[i]);
               },
-              child: ShelfListTile(shelves[index].id!, shelves[index].name,
-                  shelvesLength[index]),
+              child: ShelfListTile(
+                  shelves[i].id!, shelves[i].name, shelvesLength[i]),
             );
           },
         ),
@@ -207,54 +200,120 @@ class ShelfListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                shelfName,
-                style: Theme.of(context).textTheme.titleMedium,
+    return FutureBuilder<List<Book>>(
+      future: BookShelfDatabase.instance.loadBooksByShelf(shelfId),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          double readingTotal = 0.0;
+          for (int i = 0; i < snapshot.data!.length; i++) {
+            int readingStatus = snapshot.data![i].readingStatus;
+            if (readingStatus == 2) {
+              readingTotal += 1.0;
+            }
+          }
+
+          double readingRatio = 0.0;
+          if (snapshot.data!.isNotEmpty) {
+            readingRatio = readingTotal / snapshot.data!.length;
+          }
+
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            elevation: 0,
+            color: ElevationOverlay.applySurfaceTint(
+                Theme.of(context).colorScheme.surface,
+                Theme.of(context).colorScheme.surfaceTint,
+                1),
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.outline,
               ),
-              Flexible(
-                child: Text(
-                  "$shelfLength books",
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ),
-            ],
-          ),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 8),
-          ),
-          SizedBox(
-            height: 120.0,
-            child: FutureBuilder<List<Book>>(
-              future: BookShelfDatabase.instance.loadBooksByShelf(shelfId),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return ListView.builder(
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                  ),
+                  height: 140.0,
+                  child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: snapshot.data!.length < 10 ? snapshot.data?.length : 10,
+                    itemCount:
+                        snapshot.data!.length < 10 ? snapshot.data?.length : 10,
                     itemBuilder: (context, index) {
                       return Image.memory(snapshot.data![index].cover);
                     },
-                  );
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-                return Container(
-                  alignment: AlignmentDirectional.center,
-                  child: const CircularProgressIndicator(),
-                );
-              },
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            shelfName,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          Text(
+                            "$shelfLength books",
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: readingRatio == 1.0
+                                  ? Icon(
+                                      Icons.check_circle_rounded,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .tertiary,
+                                    )
+                                  : CircularProgressIndicator(
+                                      value: readingRatio,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .tertiary,
+                                    ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 8),
+                            ),
+                            Text(
+                              "${(readingRatio * 100.0).toInt()} % read",
+                              style: Theme.of(context).textTheme.bodySmall,
+                              textAlign: TextAlign.right,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        } else if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
+        return Container(
+          alignment: AlignmentDirectional.center,
+          child: const CircularProgressIndicator(),
+        );
+      },
     );
   }
 }

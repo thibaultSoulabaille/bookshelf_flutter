@@ -191,32 +191,6 @@ class _BooksState extends State<Books> {
       appBar: AppBar(
         title: const Text('Books'),
       ),
-      /*body: Container(
-        padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<Book>>(
-          future: BookShelfDatabase.instance.loadAllBooks(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ListView.builder(
-                  itemCount: snapshot.data?.length,
-                  itemBuilder: (context, index) {
-                    return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(snapshot.data![index].title,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18.0)),
-                          Image.memory(snapshot.data![index].cover),
-                          const Divider()
-                        ]);
-                  });
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
-            return Container(alignment: AlignmentDirectional.center,child: const CircularProgressIndicator(),);
-          },
-        ),
-      ),*/
       body: Scrollbar(
         child: ListView.builder(
           itemCount: books.length * 2,
@@ -297,7 +271,7 @@ class BookListTile extends StatelessWidget {
             color: ElevationOverlay.applySurfaceTint(
                 Theme.of(context).colorScheme.surface,
                 Theme.of(context).colorScheme.surfaceTint,
-                0),
+                1),
             shape: RoundedRectangleBorder(
               side: BorderSide(
                 color: Theme.of(context).colorScheme.outline,
@@ -316,7 +290,7 @@ class BookListTile extends StatelessWidget {
                     bottomRight: Radius.circular(12),
                   ), // Image border
                   child: SizedBox(
-                    width: 75,
+                    width: 100,
                     // height: 120,
                     // Image radius
                     child: Image.memory(
@@ -328,6 +302,7 @@ class BookListTile extends StatelessWidget {
                 const Padding(
                   padding: EdgeInsets.only(left: 16),
                 ),
+                Flexible(child:
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -348,7 +323,7 @@ class BookListTile extends StatelessWidget {
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                   ],
-                ),
+                ),),
               ],
             ),
           ),

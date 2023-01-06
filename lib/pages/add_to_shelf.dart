@@ -58,6 +58,9 @@ class _AddToShelfState extends State<AddToShelf> {
         nPages: book.nPages,
         releaseDateTimestamp: book.releaseDateTimestamp,
         language: book.language,
+        startedReadingDateTimestamp: book.startedReadingDateTimestamp,
+        endedReadingDateTimestamp: book.endedReadingDateTimestamp,
+        readingStatus: book.readingStatus,
       ),
     );
   }
